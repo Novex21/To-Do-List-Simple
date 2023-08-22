@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <title>To do list</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-dark bg-dark ">
+
+        <div class="container" style="max-width: 800px;">
+            <a href="#" class="navbar-brand">TO DO LIST
+                <span class="badge bg-warning ms-1" id="list-count">0</span>
+            </a>
+        </div>
+        <ul class="navbar-nav me-5">
+            <li class="nav-item">
+                <a href="#" id="clear" class="nav-link">Clear</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container mt-4" style="max-width: 800px;">
+        <label class="h3" for="new">Add the tasks of the day</label>
+
+        <div class="input-group mb-4">
+            <input type="text" id="new" class="form-control">
+            <button class="btn btn-info">Add</button>
+        </div>
+        
+        <ul id="todolist" class="list-group"></ul>
+        <hr>
+        <div class="h3" id="doneTasks">Congraulations!! You have done <span id="count"></span></div>
+        <ul id="done" class="list-group opacity-50 text-decoration-line-through"></ul>
+    </div>
+    <script>
+        
+        //data storage in local Storage
+
+        function getData() {
+            return JSON.parse(localStorage.getItem("data")) || []; // return the exist data or empty array
+        }
+
+        // show saved data
+        let data = getData(); 
+        data.map(item => createTask(item.text)); //print out the object property text and put it in the createTask function
+
+        function saveData(text) { //add new data
+            let data = getData();
+            data.push({text: text, done: false});
+            localStorage.setItem("data", JSON.stringify(data));
+        }
+        
+        // to remove data, get data and filter the data except the remove one and save it again
+        function removeData(text) {
+            let data = getData();
+            let result = data.filter(item => item.text != text);
+            localStorage.setItem("data", JSON.stringify(result));
+        }
+        //---------------------------------------------------------------------------------->
+
+        //to check the data
+        function checkData(text) {
+            let data = getData();
+            let result = data.map(item => {
+                if(item.text == text) item.done = true;
+                return item;
+            })
+            localStorage.setItem("data", JSON.stringify(result));
+        }
+        //---------------------------------------------------------------------------------->
+
+        //to erase the check list 
+        function removeCheckedData() {
+            let data = getData();
+            let result = data.filter(item => item.done == false);
+            localStorage.setItem("data", JSON.stringify(result));
+        }
+        //---------------------------------------------------------------------------------->
+
+        //to add text input
+        document.querySelector("button").onclick = function() {
+            let text = document.querySelector("#new").value;
+            if(!text) return false;
+
+            createTask(text);
+            saveData(text);
+            updateBadge();
+
+            document.querySelector("#new").value = ""; //erase the old value
+            document.querySelector("#new").focus(); //stay cursor still on input
+            
+        }
+        //---------------------------------------------------------------------------------->
+
+        //can use Enter Key for input data
+        document.querySelector("#new").onkeydown = function(e) {
+            if(e.key == "Enter") {
+                document.querySelector("button").onclick();
+                
+            }
+        }
+        //---------------------------------------------------------------------------------->
+
+        //label for checked list
+        let element = document.querySelector("#done");
+        let element_li = element.getElementsByTagName('li');
+        if (element_li.length<1) {
+            document.querySelector("#doneTasks").style.display = "none";
+        } 
+        //---------------------------------------------------------------------------------->
+
+       
+
+        //to do list badge
+        function updateBadge() {
+           document.querySelector("#list-count").textContent = document.querySelectorAll("#todolist li").length
+        }
+        //---------------------------------------------------------------------------------->
+
+        //Clear the finished tasks 
+        document.querySelector("#clear").onclick = function () {
+            document.querySelector("#done").innerHTML = "";
+            document.querySelector("#doneTasks").style.display = "none";
+            updateBadge();
+            removeCheckedData();
+        }
+        //---------------------------------------------------------------------------------->
+
+        //to input the data function 
+        function createTask(text) {
+
+            //for text
+            let li = document.createElement("li");
+            li.classList.add("list-group-item");
+            li.textContent = text;
+            document.querySelector("#todolist").appendChild(li);
+
+            
+            //for delete 
+            let del = document.createElement('a');
+            del.classList.add("fa-solid", "fa-trash", "float-end",
+            "text-decoration-none", "text-danger", "mt-1");
+            del.setAttribute("href", "#");
+            li.appendChild(del);
+            
+            del.onclick = function() {
+                del.parentElement.remove();
+                updateBadge();
+                removeData(text);
+            }
+
+            //check finished tasks
+            let check = document.createElement('a');
+            check.setAttribute('href',"#");
+            check.classList.add("fa-regular",
+             "fa-square",  "float-start",
+             "me-3","mt-1", "text-success", 
+             "text-decoration-none");
+            li.appendChild(check);
+
+            check.onclick = function() {
+                document.querySelector("#done").appendChild(check.parentElement);
+                check.remove();
+                del.remove();
+                updateBadge();
+                document.querySelector("#doneTasks").style.display = "block"; // display the label or header
+                checkData(text);
+
+                 //counting check tasks
+                if (element_li.length>0) {
+                        document.querySelector("#count").textContent = element_li.length + " task";
+                        if(element_li.length>1) {
+                            document.querySelector("#count").textContent = element_li.length + " tasks";
+                        }
+                }
+
+
+                
+            }   
+            
+        }   
+        
+
+            
+
+
+
+       
+    </script>
+</body>
+</html>
