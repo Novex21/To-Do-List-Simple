@@ -13,7 +13,7 @@
 
         <div class="container" style="max-width: 800px;">
             <a href="#" class="navbar-brand">TO DO LIST
-                <span class="badge bg-warning ms-1" id="list-count">0</span>
+                <span class="badge bg-warning ms-1 text-dark fs-5" id="list-count">0</span>
             </a>
         </div>
         <ul class="navbar-nav me-5">
@@ -36,6 +36,9 @@
         <div class="h3" id="doneTasks">Congraulations!! You have done <span id="count"></span></div>
         <ul id="done" class="list-group opacity-50 text-decoration-line-through"></ul>
     </div>
+
+
+
     <script>
         
         //data storage in local Storage
@@ -84,6 +87,7 @@
         //to add text input
         document.querySelector("button").onclick = function() {
             let text = document.querySelector("#new").value;
+            text = text.trim();
             if(!text) return false;
 
             createTask(text);
